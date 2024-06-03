@@ -14,7 +14,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_USER = os.getenv("DB_USER")
 
 
-SQLALCHEMY_DATABASE_URL = "{}://{}:{}@{}/{}".format(
+SQLALCHEMY_DATABASE_URL = "{}://{}:{}@[{}]/{}".format(
     DB_DIALECT, DB_USER, DB_PASSWORD, DB_HOST, DB_NAME
 )
 
