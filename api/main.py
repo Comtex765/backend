@@ -47,6 +47,21 @@ def create_arriendo(schema: sch.ArriendoBase, db: Session = Depends(get_db)):
     }
 
 
+@app.get("/inquilinos/", response_model=list[sch.InquilinoInDBBase])
+def inquilinos(db: Session = Depends(get_db)):
+    return cr.get_all_inquilinos(db)
+
+
+@app.get("/arriendos/", response_model=list[sch.ArriendoInDBBase])
+def arriendos(db: Session = Depends(get_db)):
+    return cr.get_all_arriendos(db)
+
+
+@app.get("/departamentos/", response_model=list[sch.DepartamentoInDBBase])
+def departamentos(db: Session = Depends(get_db)):
+    return cr.get_all_departamentos(db)
+
+
 @app.get("/inquilino/cedula/{cedula}", response_model=sch.InquilinoInDBBase)
 def inquilino_by_id(cedula: str, db: Session = Depends(get_db)):
     db_inquilino = cr.get_inquilino_cedula(db=db, ced=cedula)
@@ -93,3 +108,82 @@ def departamento_by_id(id: int, db: Session = Depends(get_db)):
     if db_departamento is None:
         raise HTTPException(status_code=404, detail="Departamento not found")
     return db_departamento
+
+
+@app.put("/inquilino/{id}", response_model=sch.InquilinoUpdate)
+def update_inquilino(
+    id: int, schema: sch.InquilinoUpdate, db: Session = Depends(get_db)
+):
+    db_inquilino = cr.get_inquilino_id(db=db, id_inq=id)
+    if db_inquilino is None:
+        raise HTTPException(status_code=404, detail="Inquilino not found")
+
+    success = cr.update_inquilino(
+        db=db, id_inq=db_inquilino.id_inquilino, update_data=schema
+    )
+
+    if success is None:
+        raise HTTPException(status_code=404, detail="Inquilino not updated")
+    return success
+
+
+@app.put("/departamento/{id}", response_model=sch.DepartamentoUpdate)
+def update_departamento(
+    id: int, schema: sch.DepartamentoUpdate, db: Session = Depends(get_db)
+):
+    db_departamento = cr.get_departamento_id(db=db, id_dep=id)
+    if db_departamento is None:
+        raise HTTPException(status_code=404, detail="Departamento not found")
+
+    success = cr.update_departamento(
+        db=db, id_dep=db_departamento.id_departamento, update_data=schema
+    )
+
+    if success is None:
+        raise HTTPException(status_code=404, detail="Departamento not updated")
+    return success
+
+
+@app.put("/arriendo/{id}", response_model=sch.ArriendoUpdate)
+def update_arriendo(id: int, schema: sch.ArriendoUpdate, db: Session = Depends(get_db)):
+    db_arriendo = cr.get_arriendo_id(db=db, id_ar=id)
+    if db_arriendo is None:
+        raise HTTPException(status_code=404, detail="Arriendo not found")
+
+    success = cr.update_arriendo(
+        db=db, id_ar=db_arriendo.id_arriendo, update_data=schema
+    )
+
+    if success is None:
+        raise HTTPException(status_code=404, detail="Arriendo not updated")
+    return success
+
+
+@app.delete("/inquilino/{id}", response_model=sch.InquilinoInDBBase)
+def delete_inquilino(id: int, db: Session = Depends(get_db)):
+    db_inquilino = cr.get_inquilino_id(db=db, id_inq=id)
+    if db_inquilino is None:
+        raise HTTPException(status_code=404, detail="Inquilino not found")
+
+    deleted_inquilino = cr.delete_inquilino(db=db, id_inq=id)
+    return deleted_inquilino
+
+
+@app.delete("/departamento/{id}", response_model=sch.DepartamentoInDBBase)
+def delete_departamento(id: int, db: Session = Depends(get_db)):
+    db_departamento = cr.get_departamento_id(db=db, id_dep=id)
+    if db_departamento is None:
+        raise HTTPException(status_code=404, detail="Departamento not found")
+
+    deleted_departamento = cr.delete_departamento(db=db, id_dep=id)
+    return deleted_departamento
+
+
+@app.delete("/arriendo/{id}", response_model=sch.ArriendoInDBBase)
+def delete_arriendo(id: int, db: Session = Depends(get_db)):
+    db_arriendo = cr.get_arriendo_id(db=db, id_ar=id)
+    if db_arriendo is None:
+        raise HTTPException(status_code=404, detail="Arriendo not found")
+
+    deleted_arriendo = cr.delete_arriendo(db=db, id_ar=id)
+    return deleted_arriendo

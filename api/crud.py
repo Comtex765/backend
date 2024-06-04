@@ -39,6 +39,10 @@ def create_arriendo(db: Session, ar: sch.ArriendoCreate):
     return to_create
 
 
+def get_all_inquilinos(db: Session):
+    return db.query(md.Inquilino).all()
+
+
 def get_inquilino_cedula(db: Session, ced: str):
     return db.query(md.Inquilino).filter(md.Inquilino.cedula == ced).first()
 
@@ -49,6 +53,10 @@ def get_inquilino_id(db: Session, id_inq: int):
 
 """ def get_arriendo_id(db: Session, id_ar: int):
     return db.query(md.Arriendo).filter(md.Arriendo.id_arriendo == id_ar).first() """
+
+
+def get_all_arriendos(db: Session):
+    return db.query(md.Arriendo).all()
 
 
 def get_arriendo_id(db: Session, id_ar: int):
@@ -77,9 +85,92 @@ def get_arriendo_piso(db: Session, piso_dep: str):
     )
 
 
+def get_all_departamentos(db: Session):
+    return db.query(md.Departamento).all()
+
+
 def get_departamento_id(db: Session, id_dep: int):
     return (
         db.query(md.Departamento)
         .filter(md.Departamento.id_departamento == id_dep)
         .first()
     )
+
+
+def update_inquilino(db: Session, id_inq: int, update_data: sch.InquilinoUpdate):
+    db_inquilino = (
+        db.query(md.Inquilino).filter(md.Inquilino.id_inquilino == id_inq).first()
+    )
+
+    for field, value in update_data.model_dump(exclude_unset=True).items():
+        if value != "":
+            setattr(db_inquilino, field, value)
+
+    db.commit()
+    db.refresh(db_inquilino)
+
+    return db.query(md.Inquilino).filter(md.Inquilino.id_inquilino == id_inq).first()
+
+
+def update_departamento(db: Session, id_dep: int, update_data: sch.DepartamentoUpdate):
+    db_departamento = (
+        db.query(md.Departamento)
+        .filter(md.Departamento.id_departamento == id_dep)
+        .first()
+    )
+
+    for field, value in update_data.model_dump(exclude_unset=True).items():
+        if value not in [None, "", 0]:
+            setattr(db_departamento, field, value)
+
+    db.commit()
+    db.refresh(db_departamento)
+
+    return (
+        db.query(md.Departamento)
+        .filter(md.Departamento.id_departamento == id_dep)
+        .first()
+    )
+
+
+def update_arriendo(db: Session, id_ar: int, update_data: sch.ArriendoUpdate):
+    db_arriendo = db.query(md.Arriendo).filter(md.Arriendo.id_arriendo == id_ar).first()
+
+    for field, value in update_data.model_dump(exclude_unset=True).items():
+        if value not in [None, "", 0]:
+            setattr(db_arriendo, field, value)
+
+    db.commit()
+    db.refresh(db_arriendo)
+
+    return db_arriendo
+
+
+def delete_arriendo(db: Session, id_ar: int):
+    db_arriendo = db.query(md.Arriendo).filter(md.Arriendo.id_arriendo == id_ar).first()
+    db.query(md.Arriendo).filter(md.Arriendo.id_arriendo == id_ar).delete()
+    db.commit()
+
+    return db_arriendo
+
+
+def delete_inquilino(db: Session, id_inq: int):
+    db_inquilino = (
+        db.query(md.Inquilino).filter(md.Inquilino.id_inquilino == id_inq).first()
+    )
+    db.query(md.Inquilino).filter(md.Inquilino.id_inquilino == id_inq).delete()
+    db.commit()
+
+    return db_inquilino
+
+
+def delete_departamento(db: Session, id_dep: int):
+    db_departamento = (
+        db.query(md.Departamento)
+        .filter(md.Departamento.id_departamento == id_dep)
+        .first()
+    )
+    db.query(md.Departamento).filter(md.Departamento.id_departamento == id_dep).delete()
+    db.commit()
+
+    return db_departamento

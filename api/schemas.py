@@ -4,9 +4,9 @@ from datetime import date
 
 
 class DepartamentoBase(BaseModel):
-    piso: Optional[str] = None
-    precio: Optional[float] = None
-    garantia: Optional[float] = None
+    piso: str
+    precio: float
+    garantia: float
 
     class Config:
         orm_mode: True
@@ -17,7 +17,9 @@ class DepartamentoCreate(DepartamentoBase):
 
 
 class DepartamentoUpdate(DepartamentoBase):
-    pass
+    piso: Optional[str] = ""
+    precio: Optional[float] = 0
+    garantia: Optional[float] = 0
 
 
 class DepartamentoInDBBase(DepartamentoBase):
@@ -25,9 +27,9 @@ class DepartamentoInDBBase(DepartamentoBase):
 
 
 class InquilinoBase(BaseModel):
-    nombre: Optional[str] = None
-    apellido: Optional[str] = None
-    cedula: Optional[str] = None
+    nombre: str
+    apellido: str
+    cedula: str
 
     class Config:
         orm_mode: True
@@ -37,8 +39,10 @@ class InquilinoCreate(InquilinoBase):
     pass
 
 
-class InquilinoUpdate(InquilinoBase):
-    pass
+class InquilinoUpdate(BaseModel):
+    nombre: Optional[str] = ""
+    apellido: Optional[str] = ""
+    cedula: Optional[str] = ""
 
 
 class InquilinoInDBBase(InquilinoBase):
@@ -59,8 +63,10 @@ class ArriendoCreate(ArriendoBase):
     pass
 
 
-class ArriendoUpdate(ArriendoBase):
-    pass
+class ArriendoUpdate(BaseModel):
+    id_inquilino: Optional[int] = None
+    id_departamento: Optional[int] = None
+    fecha_inicio: Optional[date] = None
 
 
 class ArriendoInDBBase(ArriendoBase):
